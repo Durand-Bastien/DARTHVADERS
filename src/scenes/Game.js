@@ -11,7 +11,14 @@ export class Game extends Scene
 
     preload () 
     {
-        this.load.image('player', '../../public/assets/player.png')
+        this.load.spritesheet('enemy', 'assets/enemy1.png', {
+            frameWidth: 60,  // Largeur d'une frame
+            frameHeight: 106  // Hauteur d'une frame
+        });  
+        this.load.spritesheet('player', 'assets/player.png', {
+            frameWidth: 82,  // Largeur d'une frame
+            frameHeight: 160  // Hauteur d'une frame
+        });   
     }
 
     create ()
