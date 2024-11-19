@@ -46,11 +46,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         projectile.setOffset(0, 0);
         projectile.setFlipY(true);
         this.scene.physics.moveTo(projectile, this.x, this.y+500, projectileSpeed);
-    
-        // Gérer la collision avec le player
-        this.scene.physics.add.collider(projectile, this.target, () => {
         
-
         projectile.anims.play('enemy_projectile'); // Jouer l'animation 'enemy_projectile'
         
         // Vitesse du projectile
