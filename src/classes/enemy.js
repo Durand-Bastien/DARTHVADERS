@@ -1,5 +1,5 @@
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, speed=60, hp, target) {
+    constructor(scene, x, y, texture, hp, target, speed=60) {
         super(scene, x, y, texture);
 
         this.speed = speed;

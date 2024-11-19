@@ -40,7 +40,7 @@ export class Game extends Scene
         });
 
         // Créer l'ennemi une seule fois
-        this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', _, 4, this.player);
+        this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
     }
 
     update(time) {
