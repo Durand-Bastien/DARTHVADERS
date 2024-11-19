@@ -19,6 +19,10 @@ export class Game extends Scene
             frameWidth: 82,  // Largeur d'une frame
             frameHeight: 120  // Hauteur d'une frame
         });   
+        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
+            frameWidth: 13,  // Largeur d'une frame
+            frameHeight: 58  // Hauteur d'une frame
+        });
     }
 
     create ()
