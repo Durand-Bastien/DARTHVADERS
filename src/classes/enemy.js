@@ -1,5 +1,5 @@
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, speed=60, hp) {
+    constructor(scene, x, y, texture, speed=60, hp, target) {
         super(scene, x, y, texture);
 
         this.speed = speed;
@@ -7,8 +7,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.maxHp = hp;
         this.currentHp = hp;
         this.isAlive = true;
+        this.target = target;
 
-        this.boundsTrigger = this.scene.add.zone(0, this.scene.scale.height+50, this.scene.scale.width, 10)
+        this.boundsTrigger = this.scene.add.zone(0, this.scene.scale.height+150, this.scene.scale.width, 10)
             .setOrigin(0)
             .setDepth(-1); // Invisible
         this.scene.physics.add.existing(this.boundsTrigger, true);
@@ -36,23 +37,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         const projectile = this.projectiles.create(this.x, this.y + this.height/2, 'projectileTexture'); // Sprite pour le projectile
 
         this.scene.physics.moveTo(projectile, this.x, this.y+500, projectileSpeed);
-        
-        // Vitesse du projectile
     
-        // Gérer la collision avec chaque cible dans `this.targetList`
-        /*this.scene.physics.add.collider(projectile, this.target, () => {
+        // Gérer la collision avec le player
+        this.scene.physics.add.collider(projectile, this.target, () => {
             // Actions lors de la collision avec la cible
             if (this.target.takeDamage) {
-                this.target.takeDamage(10); // Inflige des dégâts si la cible a une méthode `takeDamage`
+                this.target.takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
             }
             projectile.destroy(); // Détruit le projectile après avoir touché la cible
             console.log('cible touchée')
-        });*/
-    
-        // Détruire le projectile après un délai s'il ne touche rien
-        // Activer la destruction du projectile en cas de sortie des limites du monde
-        
+        });
 
+        // Activer la destruction du projectile en cas de sortie des limites du monde
         this.scene.physics.add.overlap(projectile, this.boundsTrigger, (entity) => {
             entity.destroy();
             console.log("suppr projectile")
