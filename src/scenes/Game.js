@@ -39,7 +39,8 @@ export class Game extends Scene
         this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy');
     }
 
-    update() {
+    update(time) {
         this.player.move(this.cursors);
+        this.enemy.update(time);
     }
 }

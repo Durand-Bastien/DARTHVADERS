@@ -12,6 +12,7 @@ const config = {
     height: window.innerHeight,
     parent: 'game-container',
     backgroundColor: '#028af8',
+    pixelArt: true,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -19,7 +20,8 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }  // Désactiver la gravité pour un mouvement libre
+            gravity: { y: 0 },  // Désactiver la gravité pour un mouvement libre
+            debug: true
         }
     },
     scene: [
