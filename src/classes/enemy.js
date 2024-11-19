@@ -56,7 +56,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Vitesse du projectile
     
         // Gérer la collision avec chaque cible dans `this.targetList`
-        /*this.scene.physics.add.collider(projectile, this.target, () => {
+        this.scene.physics.add.collider(projectile, this.target, () => {
             // Actions lors de la collision avec la cible
             if (this.target.takeDamage) {
                 this.target.takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
