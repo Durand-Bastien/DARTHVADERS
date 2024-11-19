@@ -17,6 +17,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         // Configuration du corps physique du joueur
         this.setCollideWorldBounds(true);  // Le joueur ne sort pas des limites du monde
+
+        // Jouer l'animation 'player_idle'
+        this.play('player_idle');
     }
 
     move(cursors)
