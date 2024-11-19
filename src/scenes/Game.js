@@ -13,7 +13,6 @@ export class Game extends Scene
 
     preload () 
     {
-        this.load.image('player', '../../public/assets/player.png')
         this.load.spritesheet('enemy', 'assets/enemy1.png', {
             frameWidth: 60,  // Largeur d'une frame
             frameHeight: 106  // Hauteur d'une frame
@@ -22,10 +21,26 @@ export class Game extends Scene
             frameWidth: 13,
             frameHeight: 58
         });
+        this.load.spritesheet('player', 'assets/player.png', {
+            frameWidth: 82,  // Largeur d'une frame
+            frameHeight: 120  // Hauteur d'une frame
+        });   
+        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
+            frameWidth: 13,  // Largeur d'une frame
+            frameHeight: 58  // Hauteur d'une frame
+
+        });
     }
 
     create ()
     {
+        this.anims.create({
+            key: 'player_idle', // Le nom de l'animation
+            frames: this.anims.generateFrameNumbers('player', { start: 1, end: 3 }), // Frames de l'animation
+            frameRate: 9, // Vitesse de l'animation
+            repeat: -1 // Répéter l'animation en boucle
+        });
+
         this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player');
 
         this.cameras.main.setBackgroundColor(0x00ff00);
