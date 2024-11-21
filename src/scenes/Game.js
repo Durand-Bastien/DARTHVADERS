@@ -41,7 +41,7 @@ export class Game extends Scene
             repeat: -1 // Répéter l'animation en boucle
         });
 
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player');
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
 
         this.cameras.main.setBackgroundColor(0x00ff00);
 
