@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import Player from '../classes/player.js'
 import Enemy from '../classes/enemy.js';
+import EnemySquad from '../classes/enemySquad.js';
 
 export class Game extends Scene
 {
@@ -36,7 +37,7 @@ export class Game extends Scene
     {
         this.anims.create({
             key: 'player_idle', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('player', { start: 1, end: 3 }), // Frames de l'animation
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }), // Frames de l'animation
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
@@ -49,17 +50,17 @@ export class Game extends Scene
 
         this.anims.create({
             key: 'enemy_idle', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('enemy', { start: 1, end: 3 }), // Frames de l'animation
+            frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 2 }), // Frames de l'animation
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
 
-        // Créer l'ennemi une seule fois
-        this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
+        this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.1, 10, 'triangle-down', this.player);
+        this.enemySquad.checkShape();
     }
 
     update(time) {
         this.player.move(this.cursors);
-        this.enemy.update(time);
+        this.enemySquad.move(time);
     }
 }
