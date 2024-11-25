@@ -10,6 +10,7 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
         this.enemies = {}
         this.size = size;
         this.shape = shape;
+        this.spacing = 60/2
         this.target = target
 
         if (!scene) {
@@ -30,10 +31,11 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
     }
 
     lineShape() {
+        this.x = this.x - (this.size * (60 + this.spacing)/2)
         for(var i = 0; i < this.size; i++) {
             var id = "enemy"+i;
             this.enemies[id] = new Enemy(this.scene, this.x, this.y, 'enemy', 4, this.target)
-            this.x += 58;
+            this.x += 60 + this.spacing;
         }
     }
 
@@ -45,14 +47,14 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
     
         while (enemiesPlaced < this.size) {
             // Calculer l'offset pour centrer la rangée
-            let offsetX = (row - 1) * 30; // Décalage horizontal pour centrer la rangée
+            let offsetX = (row - 1) * this.spacing; // Décalage horizontal pour centrer la rangée
     
             // Placer les ennemis dans la rangée
             for (let i = 0; i < row; i++) {
                 if (enemiesPlaced < this.size) {
                     let id = "enemy" + enemiesPlaced;
                     this.enemies[id] = new Enemy(this.scene, this.x - offsetX, this.y, 'enemy', 4, this.target);
-                    this.x += 60; // Espacement horizontal entre les ennemis
+                    this.x += 60 + this.spacing/2; // Espacement horizontal entre les ennemis
                     enemiesPlaced++; // Incrémenter le nombre d'ennemis placés
                 }
             }
