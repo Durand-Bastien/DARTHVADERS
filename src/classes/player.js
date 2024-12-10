@@ -17,6 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.currentWeapon = currentWeapon;
         this.projectiles = scene.physics.add.group();
         this.lastFiredLeft = true;
+        this.target;
         
         // Configuration du corps physique du joueur
         this.setCollideWorldBounds(true);  // Le joueur ne sort pas des limites du monde
@@ -76,14 +77,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Vitesse du projectile
     
         // Gérer la collision avec chaque cible dans `this.targetList`
-        /*this.scene.physics.add.collider(projectile, this.target, () => {
+        this.scene.physics.add.collider(projectile, this.target, () => {
             // Actions lors de la collision avec la cible
             if (this.target.takeDamage) {
-                this.target.takeDamage(10); // Inflige des dégâts si la cible a une méthode `takeDamage`
+                this.target.takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
             }
             projectile.destroy(); // Détruit le projectile après avoir touché la cible
             console.log('cible touchée')
-        });*/
+        });
     
         // Détruire le projectile après un délai s'il ne touche rien
         this.scene.time.delayedCall(1750, () => {

@@ -9,7 +9,7 @@ export class Game extends Scene
     {
         super('Game');
         this.player;
-        this.enemy;
+        this.enemies = {};
     }
 
     preload () 
@@ -42,8 +42,6 @@ export class Game extends Scene
             repeat: -1 // Répéter l'animation en boucle
         });
 
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
-
         this.cameras.main.setBackgroundColor(0x00ff00);
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -60,9 +58,15 @@ export class Game extends Scene
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
+        
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
 
         this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.1, 10, 'triangle-down', this.player);
         this.enemySquad.checkShape();
+        this.player.enemies = this.enemySquad.enemies;
+
+        
+
     }
 
     update(time) {
