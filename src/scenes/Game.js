@@ -55,7 +55,13 @@ export class Game extends Scene
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        this.anims.create({
+        
+        this.lastShotTime = 0;
+        /*this.input.keyboard.on("keydown-SPACE", () => {
+            this.player.shoot()
+          });*/
+      
+      this.anims.create({
             key: 'enemy_idle', // Le nom de l'animation
             frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 2 }), // Frames de l'animation
             frameRate: 9, // Vitesse de l'animation
@@ -79,6 +85,15 @@ export class Game extends Scene
             this.newEnemySquad.checkShape();
             this.enemiesSquad.push(this.newEnemySquad);
             this.lastSpawn = time;
+        }
+        // Tir automatique toutes les 250 ms
+        if (!this.lastShotTime) {
+            this.lastShotTime = 0;
+        }
+
+        if (time > this.lastShotTime + 250) { // Intervalle de 250ms pour le tir
+            this.player.shoot();
+            this.lastShotTime = time;
         }
     }
 }
