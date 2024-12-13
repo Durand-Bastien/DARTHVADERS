@@ -1,3 +1,5 @@
+import healthBar from '../classes/healthBar.js';
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, maxHp=100, speed=160, currentWeapon='default') 
     {
@@ -13,6 +15,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.speed = speed;      // Vitesse de déplacement
         this.maxHp = maxHp;      // Points de vie max du joueur 
         this.currentHp = maxHp;  // Points de vie actuels du joueur
+        this.healthBar = new healthBar(scene, 245, 50);
         this.isAlive = true;     // Indique si le joueur est vivant
         this.currentWeapon = currentWeapon;
         this.projectiles = scene.physics.add.group();
@@ -46,6 +49,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // Méthode pour recevoir des dégâts
     takeDamage(amount) {
         this.hp -= amount;
+        this.updateHealthBar();
         if (this.hp <= 0) {
             this.isAlive = false;
             this.die();
@@ -54,9 +58,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Méthode appelée lorsque le joueur meurt
     die() {
-        this.setTint(0xff0000);  // Change la couleur du sprite
         this.setVelocity(0, 0);  // Arrête le joueur
-        // Autres actions à effectuer à la mort, comme jouer une animation ou changer de scène
+        this.scene.start('GameOver'); // Redirige vers l'écran de fin de partie
     }
 
     // Méthode pour tirer un projectile

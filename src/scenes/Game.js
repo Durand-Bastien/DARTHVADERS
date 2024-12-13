@@ -1,113 +1,98 @@
 import { Scene } from 'phaser';
-import Player from '../classes/player.js'
+import Player from '../classes/player.js';
 import Enemy from '../classes/enemy.js';
 import EnemySquad from '../classes/enemySquad.js';
 
-export class Game extends Scene
-{
-    constructor ()
-    {
+export class Game extends Scene {
+    constructor() {
         super('Game');
-        this.player;
-        this.enemy;
+        this.player = null;
+        this.enemySquad = null;
     }
-
-    preload () 
-    {
+    
+    preload() {
+        // Charger les spritesheets
         this.load.spritesheet('enemy', 'assets/enemy1.png', {
-            frameWidth: 60,  // Largeur d'une frame
-            frameHeight: 106  // Hauteur d'une frame
-        });    
+            frameWidth: 60,
+            frameHeight: 106
+        });
         this.load.spritesheet('enemy_projectile', 'assets/enemy_projectile.png', {
             frameWidth: 13,
             frameHeight: 58
         });
         this.load.spritesheet('player', 'assets/player.png', {
-            frameWidth: 82,  // Largeur d'une frame
-            frameHeight: 120  // Hauteur d'une frame
-        });   
-        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
-            frameWidth: 13,  // Largeur d'une frame
-            frameHeight: 58  // Hauteur d'une frame
-
+            frameWidth: 82,
+            frameHeight: 120
         });
-    }
-    
-    preload () {
+        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
+            frameWidth: 13,
+            frameHeight: 58
+        });
         this.load.spritesheet('explosion', 'assets/explosion.png', {
-            frameWidth: 612,  // Largeur d'une frame
-            frameHeight: 612  // Hauteur d'une frame
+            frameWidth: 612,
+            frameHeight: 612
         });
         this.load.spritesheet('healthbar', 'assets/healthbar.png', {
-            frameWidth: 1784,  // Largeur d'une frame
-            frameHeight: 57  // Hauteur d'une frame
+            frameWidth: 446,
+            frameHeight: 57
         });
     }
     
-    create ()
-    {
+    create() {
+        // Vérifier si les assets sont chargés
         this.anims.create({
-            key: 'explosion', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('explosion', { start: 1, end: 4 }), // Frames de l'animation
-            frameRate: 9, // Vitesse de l'animation
-            repeat: -1 // Répéter l'animation en boucle
+            key: 'explosion',
+            frames: this.anims.generateFrameNumbers('explosion', { start: 1, end: 3 }),
+            frameRate: 9,
+            repeat: -1
         });
 
         this.anims.create({
-            key: 'player_idle', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }), // Frames de l'animation
-            frameRate: 9, // Vitesse de l'animation
-            repeat: -1 // Répéter l'animation en boucle
+            key: 'player_idle',
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }),
+            frameRate: 9,
+            repeat: -1
         });
 
+        this.anims.create({
+            key: 'enemy_idle',
+            frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 2 }),
+            frameRate: 9,
+            repeat: -1
+        });
+
+        // Ajouter le joueur au centre inférieur de l'écran
         this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
 
-        this.cameras.main.setBackgroundColor(0x00ff00);
-        
-        this.add.image(512, 384, 'background').setAlpha(0.5);
-        
-        this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
-        
-        this.input.once('pointerdown', () => {
-            
-            this.scene.start('GameOver');
-            
-        });
+        // Ajouter des ennemis
+        this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.2, 10, 'triangle-down', this.player);
 
+        // Définir la couleur de fond
+        this.cameras.main.setBackgroundColor(0x000000);
+
+        // Configurer les touches du clavier
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        
+        // Initialiser le temps de tir
         this.lastShotTime = 0;
-        /*this.input.keyboard.on("keydown-SPACE", () => {
-            this.player.shoot()
-          });*/
-      
-      this.anims.create({
-            key: 'enemy_idle', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 2 }), // Frames de l'animation
-            frameRate: 9, // Vitesse de l'animation
-            repeat: -1 // Répéter l'animation en boucle
-        });
-
-        this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.1, 10, 'triangle-down', this.player);
-        this.enemySquad.checkShape();
     }
-
+    
     update(time) {
-        this.player.move(this.cursors);
-        this.enemySquad.move(time);
-      
-        // Tir automatique toutes les 250 ms
-        if (!this.lastShotTime) {
-            this.lastShotTime = 0;
+        // Déplacer le joueur
+        if (this.player) {
+            this.player.move(this.cursors);
         }
 
-        if (time > this.lastShotTime + 250) { // Intervalle de 250ms pour le tir
-            this.player.shoot();
+        // Déplacer les ennemis
+        if (this.enemySquad) {
+            this.enemySquad.move(time);
+        }
+
+        // Gérer le tir automatique
+        if (time > this.lastShotTime + 250) { // Intervalle de 250 ms
+            if (this.player) {
+                this.player.shoot();
+            }
             this.lastShotTime = time;
         }
     }
