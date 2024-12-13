@@ -10,7 +10,7 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
         this.enemies = {}
         this.size = size;
         this.shape = shape;
-        this.spacing = 60/2
+        this.spacing = 150/2
         this.target = target
 
         if (!scene) {
