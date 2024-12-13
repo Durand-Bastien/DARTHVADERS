@@ -71,10 +71,5 @@ export class Game extends Scene
     update(time) {
         this.player.move(this.cursors);
         this.enemy.update(time);
-
-        // Test des degats
-        if (Phaser.Input.Keyboard.JustDown(this.testKey)) {
-            this.HealthBar.takeDamage();
-        }
     }
 }
