@@ -14,12 +14,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             .setDepth(-1); // Invisible
         this.scene.physics.add.existing(this.boundsTrigger, true);
 
-        this.scene.anims.create({
-            key: 'enemy_projectile', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('enemy_projectile', { start: 0, end: 2 }), // Frames de l'animation
-            frameRate: 8, // Vitesse de l'animation
-            //repeat: 0 // Répéter l'animation en boucle
-        });
+        if(!this.scene.anims.exists('enemy_projectile')) {
+            this.scene.anims.create({
+                key: 'enemy_projectile', // Le nom de l'animation
+                frames: this.anims.generateFrameNumbers('enemy_projectile', { start: 0, end: 2 }), // Frames de l'animation
+                frameRate: 8, // Vitesse de l'animation
+                //repeat: 0 // Répéter l'animation en boucle
+            });
+        }
 
         if (!scene) {
             console.error("La scène est indéfinie dans le constructeur Enemy !");
@@ -41,7 +43,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     shootProjectile(projectileSpeed = 300) {
         //const centerX = this.x+(this.width/2)
-        const projectile = this.projectiles.create(this.x, this.y + this.height/2, 'enemy_projetile'); // Sprite pour le projectile
+        const projectile = this.projectiles.create(this.x, this.y + this.height/2, 'enemy_projectile'); // Sprite pour le projectile
         projectile.setSize(13, 58);
         projectile.setOffset(0, 0);
         projectile.setFlipY(true);
@@ -77,7 +79,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.lastShotTime = 0;
             }
 
-            if (time > this.lastShotTime + 750) { // Intervalle de 500ms pour le tir
+            if (time > this.lastShotTime + 250) { // Intervalle de 500ms pour le tir
                 this.shootProjectile();
                 this.lastShotTime = time;
             }
