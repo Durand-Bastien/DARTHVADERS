@@ -7,7 +7,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Ajoute le joueur à la scène et lui assigne un corps physique
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        
+        this.setOrigin(0, 0);
+
+        this.boundsTriggerPlayerProjectile = this.scene.add.zone(0, -30, this.scene.scale.width, 10)
+            .setOrigin(0)
+            .setDepth(-1); // Invisible
+        this.scene.physics.add.existing(this.boundsTriggerPlayerProjectile, true);
 
         // Définit des propriétés du joueur
         this.speed = speed;      // Vitesse de déplacement
@@ -74,31 +79,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.scene.physics.moveTo(projectile, centerX-(this.width/2), this.y-500, projectileSpeed);
             this.lastFiredLeft = !this.lastFiredLeft 
         }
-        // Vitesse du projectile
     
-        // Parcours de chaque squad dans this.enemies
-        Object.keys(this.enemies).forEach(squadId => {
-            // Parcours des ennemis de chaque squad
-            Object.keys(this.enemies[squadId]).forEach(enemyId => {
-                const enemy = this.enemies[squadId][enemyId];
-
-                // Gérer la collision avec chaque ennemi
-                this.scene.physics.add.overlap(projectile, enemy, () => {
-                    // Actions lors de la collision avec l'ennemi
-                    if (enemy.takeDamage) {
-                        enemy.takeDamage(1); // Inflige des dégâts si l'ennemi a une méthode `takeDamage`
-                    }
-                    projectile.destroy(); // Détruit le projectile après avoir touché l'ennemi
-                    console.log('Cible touchée:', enemy);
-                });
-            });
+        this.scene.physics.add.overlap(projectile, this.boundsTriggerPlayerProjectile, (projectile) => {
+            this.projectiles.remove(projectile, true, true);
         });
-    
-        // Détruire le projectile après un délai s'il ne touche rien
-        this.scene.time.delayedCall(1750, () => {
-            if (projectile.active) {
-                projectile.destroy();
-            }
+    }
+
+    addEnemyCollision(enemy) {
+        // Itérer sur tous les projectiles dans le groupe
+        this.projectiles.getChildren().forEach(projectile => {
+            this.scene.physics.add.overlap(projectile, enemy, () => {
+                if (enemy.takeDamage) {
+                    enemy.takeDamage(1);  // Inflige des dégâts à l'ennemi
+                }
+                this.projectiles.remove(projectile, true, true);  // Détruit le projectile après la collision
+            });
         });
     }
 }

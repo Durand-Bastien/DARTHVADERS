@@ -10,7 +10,8 @@ export class Game extends Scene
         super('Game');
         this.player;
         this.enemiesSquad = [];
-        this.squadCount = 0
+        this.squadCount = 0;
+        this.enemyProjectiles;
     }
 
     preload () 
@@ -41,7 +42,6 @@ export class Game extends Scene
         //Difficultés
         this.difficulty = 1;
 
-
         this.anims.create({
             key: 'player_idle', // Le nom de l'animation
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }), // Frames de l'animation
@@ -67,40 +67,43 @@ export class Game extends Scene
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
+
+        this.enemyProjectiles = this.physics.add.group();
     }
 
     update(time) {
         this.player.move(this.cursors);
 
-        this.enemiesSquad.forEach(squad => { 
+        this.enemiesSquad.forEach((squad, index) => { 
             squad.move(time)
 
+            if (Object.keys(squad.enemies).length === 0) {
+                console.log(`Squad ${squad.id} supprimée car vide.`);
+
+                // Nettoyer la squad (sprites, groupes, etc.)
+                squad.destroy();
+
+                // Supprimer la squad du tableau
+                this.enemiesSquad.splice(index, 1);
+            }
+
             Object.entries(squad.enemies).forEach(([id, enemy]) => {
-
-                const squadId = squad.id; // ID unique de la squad
-
-                // Si le sous-dictionnaire pour cette squad n'existe pas encore, on le crée
-                if (!this.player.enemies[squadId]) {
-                    this.player.enemies[squadId] = {}; // Crée le sous-dictionnaire pour la squad
-                }
-                
-                if (!this.player.enemies[id]) { 
-                    this.player.enemies[squadId][id] = enemy; // Ajout de l'ennemi au joueur
-                }
+                this.player.addEnemyCollision(enemy);
             });
         });
 
         if(!this.lastSpawn) this.lastSpawn = 0;
 
-        if(time > this.lastSpawn + 3000) {
+        if(time > this.lastSpawn + 5000) {
             //random shape
             this.shape = Math.random() > 0.5 ? 'triangle-down' : 'line';
             this.number = Math.random() * 10
             this.newEnemySquad = new EnemySquad(this, this.scale.width * (Math.random()),this.scale.height * 0.1, this.number, this.shape, this.player)
             this.newEnemySquad.checkShape();
-            this.newEnemySquad.id = this.squadCount++;
             this.enemiesSquad.push(this.newEnemySquad);
             this.lastSpawn = time;
+
+            console.log(this.enemiesSquad)
         }
         // Tir automatique toutes les 250 ms
         if (!this.lastShotTime) {
@@ -111,5 +114,14 @@ export class Game extends Scene
             this.player.shoot();
             this.lastShotTime = time;
         }
+
+        this.enemyProjectiles.getChildren().forEach(projectile => {
+            if (!projectile.active) {
+                // Retirer le projectile du groupe et le supprimer totalement
+                this.scene.enemyProjectiles.remove(projectile, true, true); // true pour détruire et retirer
+                console.log(this.enemyProjectiles)
+                console.log(this.projectiles)
+            }
+        });
     }
 }
