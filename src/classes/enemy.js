@@ -60,13 +60,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.target.takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
             }
             projectile.destroy(); // Détruit le projectile après avoir touché la cible
-            console.log('cible touchée')
         });
 
         // Activer la destruction du projectile en cas de sortie des limites du monde
         this.scene.physics.add.overlap(projectile, this.boundsTrigger, (entity) => {
             entity.destroy();
-            console.log("suppr projectile")
         });
     }
 

@@ -17,7 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.currentWeapon = currentWeapon;
         this.projectiles = scene.physics.add.group();
         this.lastFiredLeft = true;
-        this.enemies;
+        this.enemies = {};
         
         // Configuration du corps physique du joueur
         this.setCollideWorldBounds(true);  // Le joueur ne sort pas des limites du monde
@@ -76,21 +76,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
         // Vitesse du projectile
     
-        Object.keys(this.enemies).forEach(key => {
-            //console.log(`Key: ${key}, Value:`, this.enemies[key]);
+        // Parcours de chaque squad dans this.enemies
+        Object.keys(this.enemies).forEach(squadId => {
+            // Parcours des ennemis de chaque squad
+            Object.keys(this.enemies[squadId]).forEach(enemyId => {
+                const enemy = this.enemies[squadId][enemyId];
 
-            // Gérer la collision avec chaque cible dans `this.enemies`
-            this.scene.physics.add.overlap(projectile, this.enemies[key], () => {
-                // Actions lors de la collision avec la cible
-                if (this.enemies[key].takeDamage) {
-                    this.enemies[key].takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
-                }
-                projectile.destroy(); // Détruit le projectile après avoir touché la cible
-                console.log('cible touchée')
+                // Gérer la collision avec chaque ennemi
+                this.scene.physics.add.overlap(projectile, enemy, () => {
+                    // Actions lors de la collision avec l'ennemi
+                    if (enemy.takeDamage) {
+                        enemy.takeDamage(1); // Inflige des dégâts si l'ennemi a une méthode `takeDamage`
+                    }
+                    projectile.destroy(); // Détruit le projectile après avoir touché l'ennemi
+                    console.log('Cible touchée:', enemy);
+                });
             });
         });
-        
-        
     
         // Détruire le projectile après un délai s'il ne touche rien
         this.scene.time.delayedCall(1750, () => {
