@@ -9,7 +9,7 @@ export class Game extends Scene
     {
         super('Game');
         this.player;
-        this.enemies = {};
+        this.enemiesSquad = [];
     }
 
     preload () 
@@ -35,12 +35,20 @@ export class Game extends Scene
 
     create ()
     {
+        //Timer du dernier spawn des enemies
+        this.lastSpawn = 0;
+        //Difficultés
+        this.difficulty = 1;
+
+
         this.anims.create({
             key: 'player_idle', // Le nom de l'animation
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }), // Frames de l'animation
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
+
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 400);
 
         this.cameras.main.setBackgroundColor(0x00ff00);
 
@@ -58,21 +66,25 @@ export class Game extends Scene
             frameRate: 9, // Vitesse de l'animation
             repeat: -1 // Répéter l'animation en boucle
         });
-        
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
-
-        this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.1, 10, 'triangle-down', this.player);
-        this.enemySquad.checkShape();
-        this.player.enemies = this.enemySquad.enemies;
-
-        
-
     }
 
     update(time) {
         this.player.move(this.cursors);
-        this.enemySquad.move(time);
-      
+        this.enemiesSquad.forEach(element => { element.move(time)
+            
+        });;
+
+        if(!this.lastSpawn) this.lastSpawn = 0;
+
+        if(time > this.lastSpawn + 3000) {
+            //random shape
+            this.shape = Math.random() > 0.5 ? 'triangle-down' : 'line';
+            this.number = Math.random() * 10
+            this.newEnemySquad = new EnemySquad(this, this.scale.width * (Math.random()),this.scale.height * 0.1, this.number, this.shape, this.player)
+            this.newEnemySquad.checkShape();
+            this.enemiesSquad.push(this.newEnemySquad);
+            this.lastSpawn = time;
+        }
         // Tir automatique toutes les 250 ms
         if (!this.lastShotTime) {
             this.lastShotTime = 0;
