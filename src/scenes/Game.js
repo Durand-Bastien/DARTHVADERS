@@ -1,13 +1,14 @@
 import { Scene } from 'phaser';
 import Player from '../classes/player.js';
 import Enemy from '../classes/enemy.js';
-import EnemySquad from '../classes/enemySquad.js';
+import HealthBar from '../classes/healthbar.js';
 
 export class Game extends Scene {
     constructor() {
         super('Game');
-        this.player = null;
-        this.enemySquad = null;
+        this.player;
+        this.enemy;
+        this.healthBar;
     }
     
     preload() {
@@ -72,6 +73,19 @@ export class Game extends Scene {
 
         // Configurer les touches du clavier
         this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Créer l'ennemi une seule fois
+        this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
+
+        this.healthBar = new HealthBar(this, this.scale.width * 0.5, this.scale.height * 0.95);
+
+        // Raccourci pour tester la perte de vie
+        this.input.keyboard.on('keydown-T', () => {
+            if (this.healthBar) {
+                this.healthBar.takeDamage();
+            }
+        });
+    }
 
         // Initialiser le temps de tir
         this.lastShotTime = 0;
