@@ -9,8 +9,8 @@ export class Game extends Scene
     {
         super('Game');
         this.player;
-        this.enemy;
         this.enemiesSquad = [];
+        this.squadCount = 0
     }
 
     preload () 
@@ -71,9 +71,24 @@ export class Game extends Scene
 
     update(time) {
         this.player.move(this.cursors);
-        this.enemiesSquad.forEach(element => { element.move(time)
-            
-        });;
+
+        this.enemiesSquad.forEach(squad => { 
+            squad.move(time)
+
+            Object.entries(squad.enemies).forEach(([id, enemy]) => {
+
+                const squadId = squad.id; // ID unique de la squad
+
+                // Si le sous-dictionnaire pour cette squad n'existe pas encore, on le crée
+                if (!this.player.enemies[squadId]) {
+                    this.player.enemies[squadId] = {}; // Crée le sous-dictionnaire pour la squad
+                }
+                
+                if (!this.player.enemies[id]) { 
+                    this.player.enemies[squadId][id] = enemy; // Ajout de l'ennemi au joueur
+                }
+            });
+        });
 
         if(!this.lastSpawn) this.lastSpawn = 0;
 
@@ -83,6 +98,7 @@ export class Game extends Scene
             this.number = Math.random() * 10
             this.newEnemySquad = new EnemySquad(this, this.scale.width * (Math.random()),this.scale.height * 0.1, this.number, this.shape, this.player)
             this.newEnemySquad.checkShape();
+            this.newEnemySquad.id = this.squadCount++;
             this.enemiesSquad.push(this.newEnemySquad);
             this.lastSpawn = time;
         }
