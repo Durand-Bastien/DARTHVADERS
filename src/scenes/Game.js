@@ -1,16 +1,19 @@
 import { Scene } from 'phaser';
 import Player from '../classes/player.js';
 import Enemy from '../classes/enemy.js';
-import HealthBar from '../classes/healthbar.js';
+import EnemySquad from '../classes/enemySquad.js'; // Supposons que EnemySquad est utilisé
 
 export class Game extends Scene {
     constructor() {
         super('Game');
-        this.player;
-        this.enemy;
-        this.healthBar;
+        this.player = null;
+        this.enemy = null;
+        this.healthBar = null;
+        this.enemySquad = null;
+        this.cursors = null;
+        this.lastShotTime = 0; // Initialiser le temps de tir
     }
-    
+
     preload() {
         // Charger les spritesheets
         this.load.spritesheet('enemy', 'assets/enemy1.png', {
@@ -38,7 +41,7 @@ export class Game extends Scene {
             frameHeight: 57
         });
     }
-    
+
     create() {
         // Vérifier si les assets sont chargés
         this.anims.create({
@@ -65,7 +68,7 @@ export class Game extends Scene {
         // Ajouter le joueur au centre inférieur de l'écran
         this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
 
-        // Ajouter des ennemis
+        // Ajouter des ennemis (si EnemySquad est utilisé)
         this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.2, 10, 'triangle-down', this.player);
 
         // Définir la couleur de fond
@@ -77,20 +80,14 @@ export class Game extends Scene {
         // Créer l'ennemi une seule fois
         this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
 
-        this.healthBar = new HealthBar(this, this.scale.width * 0.5, this.scale.height * 0.95);
-
         // Raccourci pour tester la perte de vie
         this.input.keyboard.on('keydown-T', () => {
-            if (this.healthBar) {
-                this.healthBar.takeDamage();
+            if (this.player.healthBar) {
+                this.player.takeDamage();
             }
         });
     }
 
-        // Initialiser le temps de tir
-        this.lastShotTime = 0;
-    }
-    
     update(time) {
         // Déplacer le joueur
         if (this.player) {
