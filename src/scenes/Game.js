@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import Player from '../classes/player.js'
 import Enemy from '../classes/enemy.js';
+import HealthBar from '../classes/healthbar.js';
 
 export class Game extends Scene
 {
@@ -9,6 +10,7 @@ export class Game extends Scene
         super('Game');
         this.player;
         this.enemy;
+        this.healthBar;
     }
 
     preload () 
@@ -28,7 +30,6 @@ export class Game extends Scene
         this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
             frameWidth: 13,  // Largeur d'une frame
             frameHeight: 58  // Hauteur d'une frame
-
         });
     }
 
@@ -56,10 +57,24 @@ export class Game extends Scene
 
         // Créer l'ennemi une seule fois
         this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
+
+        this.healthBar = new HealthBar(this, this.scale.width * 0.5, this.scale.height * 0.95);
+
+        // Raccourci pour tester la perte de vie
+        this.input.keyboard.on('keydown-T', () => {
+            if (this.healthBar) {
+                this.healthBar.takeDamage();
+            }
+        });
     }
 
     update(time) {
         this.player.move(this.cursors);
         this.enemy.update(time);
+
+        // Test des degats
+        if (Phaser.Input.Keyboard.JustDown(this.testKey)) {
+            this.HealthBar.takeDamage();
+        }
     }
 }
