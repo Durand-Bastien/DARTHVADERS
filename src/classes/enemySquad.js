@@ -34,7 +34,7 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
         this.x = this.x - (this.size * (60 + this.spacing)/2)
         for(var i = 0; i < this.size; i++) {
             var id = "enemy"+i;
-            this.enemies[id] = new Enemy(this.scene, this.x, this.y, 'enemy', 4, this.target)
+            this.enemies[id] = new Enemy(this.scene, this.x, this.y, 'enemy', 2, this.target)
             this.x += 60 + this.spacing;
         }
     }
