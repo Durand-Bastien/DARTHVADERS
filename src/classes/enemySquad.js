@@ -6,11 +6,10 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
 
         this.scene = scene;
         this.speed = speed;
-        this.enemiesSprites = scene.physics.add.group();
         this.enemies = {}
         this.size = size;
         this.shape = shape;
-        this.spacing = 60/2
+        this.spacing = 150/2
         this.target = target
 
         if (!scene) {
@@ -34,7 +33,7 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
         this.x = this.x - (this.size * (60 + this.spacing)/2)
         for(var i = 0; i < this.size; i++) {
             var id = "enemy"+i;
-            this.enemies[id] = new Enemy(this.scene, this.x, this.y, 'enemy', 4, this.target)
+            this.enemies[id] = new Enemy(this.scene, this.x, this.y, 'enemy', 2, this.target)
             this.x += 60 + this.spacing;
         }
     }
@@ -70,7 +69,12 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
 
     move(time) {
         for (const key in this.enemies) {
-            this.enemies[key].update(time);
+            if(this.enemies[key].active){
+                this.enemies[key].update(time);
+            } else {
+                this.enemies[key].removeAllListeners();
+                delete this.enemies[key];
+            }
         }
     }
 }

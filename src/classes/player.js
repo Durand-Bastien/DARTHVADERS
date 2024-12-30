@@ -9,16 +9,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Ajoute le joueur à la scène et lui assigne un corps physique
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        
         // Créer la barre de vie
         this.healthBar = new HealthBar(scene, scene.scale.width * 0.15, scene.scale.height * 0.075);
-        
+      
+        this.setOrigin(0, 0);
+
+        this.boundsTriggerPlayerProjectile = this.scene.add.zone(0, -30, this.scene.scale.width, 10)
+            .setOrigin(0)
+            .setDepth(-1); // Invisible
+        this.scene.physics.add.existing(this.boundsTriggerPlayerProjectile, true);
+      
         // Définit des propriétés du joueur
         this.speed = speed;      // Vitesse de déplacement
         this.isAlive = true;     // Indique si le joueur est vivant
         this.currentWeapon = currentWeapon;
         this.projectiles = scene.physics.add.group();
         this.lastFiredLeft = true;
+        this.enemies = {};
         
         // Configuration du corps physique du joueur
         this.setCollideWorldBounds(true);  // Le joueur ne sort pas des limites du monde
@@ -100,6 +107,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (projectile.active) {
                 projectile.destroy();
             }
+        this.scene.physics.add.overlap(projectile, this.boundsTriggerPlayerProjectile, (projectile) => {
+            this.projectiles.remove(projectile, true, true);
+        });
+    }
+
+    addEnemyCollision(enemy) {
+        // Itérer sur tous les projectiles dans le groupe
+        this.projectiles.getChildren().forEach(projectile => {
+            this.scene.physics.add.overlap(projectile, enemy, () => {
+                if (enemy.takeDamage) {
+                    enemy.takeDamage(1);  // Inflige des dégâts à l'ennemi
+                }
+                this.projectiles.remove(projectile, true, true);  // Détruit le projectile après la collision
+            });
         });
     }
 }

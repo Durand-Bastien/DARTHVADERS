@@ -9,9 +9,11 @@ export class Game extends Scene {
         this.player = null;
         this.enemy = null;
         this.healthBar = null;
-        this.enemySquad = null;
         this.cursors = null;
         this.lastShotTime = 0; // Initialiser le temps de tir
+        this.enemiesSquad = [];
+        this.squadCount = 0;
+        this.enemyProjectiles;
     }
 
     preload() {
@@ -50,6 +52,10 @@ export class Game extends Scene {
             frameRate: 9,
             repeat: -1
         });
+        //Timer du dernier spawn des enemies
+        this.lastSpawn = 0;
+        //Difficultés
+        this.difficulty = 1;
 
         this.anims.create({
             key: 'player_idle',
@@ -65,8 +71,7 @@ export class Game extends Scene {
             repeat: -1
         });
 
-        // Ajouter le joueur au centre inférieur de l'écran
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 200);
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 400);
 
         // Ajouter des ennemis (si EnemySquad est utilisé)
         this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.2, 10, 'triangle-down', this.player);
@@ -79,24 +84,46 @@ export class Game extends Scene {
 
         // Créer l'ennemi une seule fois
         this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
-
-        // Raccourci pour tester la perte de vie
-        this.input.keyboard.on('keydown-T', () => {
-            if (this.player.healthBar) {
-                this.player.takeDamage();
-            }
-        });
+        this.enemyProjectiles = this.physics.add.group();
     }
 
     update(time) {
-        // Déplacer le joueur
-        if (this.player) {
-            this.player.move(this.cursors);
-        }
+        this.player.move(this.cursors);
 
-        // Déplacer les ennemis
-        if (this.enemySquad) {
-            this.enemySquad.move(time);
+        this.enemiesSquad.forEach((squad, index) => { 
+            squad.move(time)
+
+            if (Object.keys(squad.enemies).length === 0) {
+                console.log(`Squad ${squad.id} supprimée car vide.`);
+
+                // Nettoyer la squad (sprites, groupes, etc.)
+                squad.destroy();
+
+                // Supprimer la squad du tableau
+                this.enemiesSquad.splice(index, 1);
+            }
+
+            Object.entries(squad.enemies).forEach(([id, enemy]) => {
+                this.player.addEnemyCollision(enemy);
+            });
+        });
+
+        if(!this.lastSpawn) this.lastSpawn = 0;
+
+        if(time > this.lastSpawn + 5000) {
+            //random shape
+            this.shape = Math.random() > 0.5 ? 'triangle-down' : 'line';
+            this.number = Math.random() * 10
+            this.newEnemySquad = new EnemySquad(this, this.scale.width * (Math.random()),this.scale.height * 0.1, this.number, this.shape, this.player)
+            this.newEnemySquad.checkShape();
+            this.enemiesSquad.push(this.newEnemySquad);
+            this.lastSpawn = time;
+
+            console.log(this.enemiesSquad)
+        }
+        // Tir automatique toutes les 250 ms
+        if (!this.lastShotTime) {
+            this.lastShotTime = 0;
         }
 
         // Gérer le tir automatique
@@ -106,5 +133,14 @@ export class Game extends Scene {
             }
             this.lastShotTime = time;
         }
+
+        this.enemyProjectiles.getChildren().forEach(projectile => {
+            if (!projectile.active) {
+                // Retirer le projectile du groupe et le supprimer totalement
+                this.scene.enemyProjectiles.remove(projectile, true, true); // true pour détruire et retirer
+                console.log(this.enemyProjectiles)
+                console.log(this.projectiles)
+            }
+        });
     }
 }
