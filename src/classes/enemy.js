@@ -2,14 +2,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, hp, target, speed=60) {
         super(scene, x, y, texture);
 
+        this.scene = scene;
         this.speed = speed;
-        this.projectiles = scene.physics.add.group();
         this.maxHp = hp;
         this.currentHp = hp;
         this.isAlive = true;
         this.target = target;
 
-        this.boundsTrigger = this.scene.add.zone(0, this.scene.scale.height+150, this.scene.scale.width, 10)
+        this.boundsTrigger = this.scene.add.zone(-this.scene.scale.width, this.scene.scale.height+150, this.scene.scale.width*3, 10)
             .setOrigin(0)
             .setDepth(-1); // Invisible
         this.scene.physics.add.existing(this.boundsTrigger, true);
@@ -43,7 +43,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     shootProjectile(projectileSpeed = 300) {
         //const centerX = this.x+(this.width/2)
-        const projectile = this.projectiles.create(this.x, this.y + this.height/2, 'enemy_projectile'); // Sprite pour le projectile
+        const projectile = this.scene.enemyProjectiles.create(this.x, this.y + this.height/2, 'enemy_projectile'); // Sprite pour le projectile
         projectile.setSize(13, 58);
         projectile.setOffset(0, 0);
         projectile.setFlipY(true);
@@ -59,12 +59,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             if (this.target.takeDamage) {
                 this.target.takeDamage(1); // Inflige des dégâts si la cible a une méthode `takeDamage`
             }
-            projectile.destroy(); // Détruit le projectile après avoir touché la cible
+            projectile.destroy();
         });
 
         // Activer la destruction du projectile en cas de sortie des limites du monde
-        this.scene.physics.add.overlap(projectile, this.boundsTrigger, (entity) => {
-            entity.destroy();
+        this.scene.physics.add.overlap(projectile, this.boundsTrigger, (projectile) => {
+            projectile.destroy();
         });
     }
 
@@ -80,21 +80,20 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if(this.isAlive){
                 this.move();
 
-            // Tir automatique toutes les 500 ms
+            // Tir automatique toutes les 2000 ms
             if (!this.lastShotTime) {
                 this.lastShotTime = 0;
             }
 
-            if (time > this.lastShotTime + 2000) { // Intervalle de 500ms pour le tir
+            if (time > this.lastShotTime + 2000) { // Intervalle de 2000 ms pour le tir
                 this.shootProjectile();
                 this.lastShotTime = time;
             }
 
 
-            this.scene.physics.add.overlap(this, this.boundsTrigger, (entity) => {
+            this.scene.physics.add.overlap(this, this.boundsTrigger, () => {
                 this.isAlive = false;
                 this.destroy();
-                console.log("suppr enemy")
             });
         }
         
