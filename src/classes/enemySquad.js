@@ -52,7 +52,7 @@ export default class EnemySquad extends Phaser.Physics.Arcade.Sprite {
             for (let i = 0; i < row; i++) {
                 if (enemiesPlaced < this.size) {
                     let id = "enemy" + enemiesPlaced;
-                    this.enemies[id] = new Enemy(this.scene, this.x - offsetX, this.y, 'enemy', 4, this.target);
+                    this.enemies[id] = new Enemy(this.scene, this.x - offsetX, this.y, 'enemy', 2, this.target);
                     this.x += 60 + this.spacing/2; // Espacement horizontal entre les ennemis
                     enemiesPlaced++; // Incrémenter le nombre d'ennemis placés
                 }

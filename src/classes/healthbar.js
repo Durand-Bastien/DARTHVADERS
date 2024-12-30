@@ -14,7 +14,7 @@ export default class HealthBar {
 
     takeDamage() {
         // Réduire la santé du joueur
-        this.health -= 1;
+        this.health--;
         // Afficher la vie actuelle dans la console
         console.log('Santé actuelle :', this.health);
         // Mettre à jour l'affichage de la barre

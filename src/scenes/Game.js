@@ -56,16 +56,12 @@ export class Game extends Scene {
             frameRate: 9,
             repeat: -1
         });
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player');
-        
-        this.cameras.main.setBackgroundColor(0x00ff00);
-        
-        this.cursors = this.input.keyboard.createCursorKeys();
       
         //Timer du dernier spawn des enemies
         this.lastSpawn = 0;
         //Difficultés
         this.difficulty = 1;
+        this.enemyProjectiles = this.physics.add.group();
 
         this.anims.create({
             key: 'player_idle',
@@ -80,19 +76,19 @@ export class Game extends Scene {
             frameRate: 9,
             repeat: -1
         });
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 400);
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 400);
 
         // Ajouter des ennemis (si EnemySquad est utilisé)
         this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.2, 10, 'triangle-down', this.player);
 
         // Définir la couleur de fond
-        this.cameras.main.setBackgroundColor(0x000000);
+        //this.cameras.main.setBackgroundColor(0x000000);
 
         // Configurer les touches du clavier
         this.cursors = this.input.keyboard.createCursorKeys();
         // Créer l'ennemi une seule fois
-        this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
-        this.enemyProjectiles = this.physics.add.group();
+        //this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
+        
     }
     
     update(time) {
@@ -146,8 +142,6 @@ export class Game extends Scene {
             if (!projectile.active) {
                 // Retirer le projectile du groupe et le supprimer totalement
                 this.scene.enemyProjectiles.remove(projectile, true, true); // true pour détruire et retirer
-                console.log(this.enemyProjectiles)
-                console.log(this.projectiles)
             }
         });
     }

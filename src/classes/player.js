@@ -1,4 +1,4 @@
-import HealthBar from '../classes/healthbar.js';
+import HealthBar from './healthbar.js';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, speed=160, currentWeapon='default') 
@@ -32,6 +32,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         // Jouer l'animation 'player_idle'
         this.play('player_idle');
+
+        this.scene.anims.create({
+            key: 'player_projectile', // Le nom de l'animation
+            frames: this.anims.generateFrameNumbers('player_projectile', { start: 0, end: 2 }), // Frames de l'animation
+            frameRate: 8, // Vitesse de l'animation
+            //repeat: 0 // Répéter l'animation en boucle
+        });
     }
     
     move(cursors)
@@ -81,34 +88,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const centerX = this.x+(this.width/2)
         var projectile = null;
         if(!this.lastFiredLeft) {
-            projectile = this.projectiles.create(centerX+(this.width/2), this.y+5, 'projectileTexture'); // Sprite pour le projectile
+            projectile = this.projectiles.create(centerX+(this.width/2), this.y+5, 'player_projectile'); // Sprite pour le projectile
             this.scene.physics.moveTo(projectile, centerX+(this.width/2), this.y-500, projectileSpeed); 
             this.lastFiredLeft = !this.lastFiredLeft
         }
         else {
-            projectile = this.projectiles.create(centerX-(this.width/2), this.y+5, 'projectileTexture'); // Sprite pour le projectile
+            projectile = this.projectiles.create(centerX-(this.width/2), this.y+5, 'player_projectile'); // Sprite pour le projectile
             this.scene.physics.moveTo(projectile, centerX-(this.width/2), this.y-500, projectileSpeed);
             this.lastFiredLeft = !this.lastFiredLeft 
         }
-        // Vitesse du projectile
+        projectile.anims.play('player_projectile');
         
-        // Gérer la collision avec chaque cible dans `this.targetList`
-        /*this.scene.physics.add.collider(projectile, this.target, () => {
-            // Actions lors de la collision avec la cible
-        if (this.target.takeDamage) {
-        this.target.takeDamage(10); // Inflige des dégâts si la cible a une méthode `takeDamage`
-        }
-        projectile.destroy(); // Détruit le projectile après avoir touché la cible
-        console.log('cible touchée')
-        });*/
-        
-        // Détruire le projectile après un délai s'il ne touche rien
-        this.scene.time.delayedCall(1750, () => {
-            if (projectile.active) {
-                projectile.destroy();
-            }
         this.scene.physics.add.overlap(projectile, this.boundsTriggerPlayerProjectile, (projectile) => {
             this.projectiles.remove(projectile, true, true);
+            console.log('proj détruit')
         });
     }
 
