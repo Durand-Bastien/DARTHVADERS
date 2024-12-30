@@ -85,7 +85,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.lastShotTime = 0;
             }
 
-            if (time > this.lastShotTime + 2000) { // Intervalle de 2000 ms pour le tir
+            if (time > this.lastShotTime + 250) { // Intervalle de 500ms pour le tir
                 this.shootProjectile();
                 this.lastShotTime = time;
             }
