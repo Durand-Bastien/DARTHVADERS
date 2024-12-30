@@ -42,16 +42,26 @@ export class Game extends Scene {
             frameWidth: 446,
             frameHeight: 57
         });
+        this.load.image('background', 'assets/background_game.jpg');
     }
-
-    create() {
-        // Vérifier si les assets sont chargés
+  
+    create ()
+    {
+        this.add.image(this.scale.width / 2, this.scale.height / 2, 'background')
+        .setOrigin(0.5) // Centre l'image
+        .setDisplaySize(this.scale.width, this.scale.height); // Ajuste la taille à celle de l'écran
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNumbers('explosion', { start: 1, end: 3 }),
             frameRate: 9,
             repeat: -1
         });
+        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player');
+        
+        this.cameras.main.setBackgroundColor(0x00ff00);
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+      
         //Timer du dernier spawn des enemies
         this.lastSpawn = 0;
         //Difficultés
@@ -63,14 +73,13 @@ export class Game extends Scene {
             frameRate: 9,
             repeat: -1
         });
-
+      
         this.anims.create({
             key: 'enemy_idle',
             frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 2 }),
             frameRate: 9,
             repeat: -1
         });
-
         this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 5, 400);
 
         // Ajouter des ennemis (si EnemySquad est utilisé)
@@ -81,12 +90,11 @@ export class Game extends Scene {
 
         // Configurer les touches du clavier
         this.cursors = this.input.keyboard.createCursorKeys();
-
         // Créer l'ennemi une seule fois
         this.enemy = new Enemy(this, this.scale.width * 0.5, this.scale.height * 0.1, 'enemy', 4, this.player);
         this.enemyProjectiles = this.physics.add.group();
     }
-
+    
     update(time) {
         this.player.move(this.cursors);
 
