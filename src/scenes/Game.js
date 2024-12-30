@@ -50,10 +50,11 @@ export class Game extends Scene {
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'background')
         .setOrigin(0.5) // Centre l'image
         .setDisplaySize(this.scale.width, this.scale.height); // Ajuste la taille à celle de l'écran
+
         this.anims.create({
             key: 'explosion',
-            frames: this.anims.generateFrameNumbers('explosion', { start: 1, end: 3 }),
-            frameRate: 9,
+            frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 3 }),
+            frameRate: 8,
             repeat: -1
         });
       

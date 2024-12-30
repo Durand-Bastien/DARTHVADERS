@@ -71,8 +71,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     takeDamage(){
         this.currentHp--;
         if(this.currentHp == 0){
-            this.isAlive = false;
+            this.anims.play('explosion')
+            this.scene.time.delayedCall(1000/6, () => {
+                this.isAlive = false;
             this.destroy();
+            });
         }
     }
 
