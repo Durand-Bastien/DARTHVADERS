@@ -6,18 +6,18 @@ export default class HealthBar {
     /**
     * Constructeur de la barre de vie.
     * Initialise la barre de vie et sa position dans la scène.
-    * @param {Phaser.Scene} scene - La scène où la barre de vie est ajoutée.
-    * @param {number} x - Position X de la barre de vie.
-    * @param {number} y - Position Y de la barre de vie.
+    * @param {Phaser.Scene} p_scene - La scène où la barre de vie est ajoutée.
+    * @param {number} p_x - Position X de la barre de vie.
+    * @param {number} p_y - Position Y de la barre de vie.
     */
-    constructor(scene, x, y) {
-        this.scene = scene; // Scène associée à la barre de vie
-        this.x = x;         // Position X
-        this.y = y;         // Position Y
-        this.health = 3;    // Santé initiale
+    constructor(p_scene, p_x, p_y) {
+        this.m_scene = p_scene; // Scène associée à la barre de vie
+        this.m_x = p_x;         // Position X
+        this.m_y = p_y;         // Position Y
+        this.m_health = 3;      // Santé initiale
         
         // Ajouter le sprite de la barre de vie
-        this.sprite = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5);
+        this.m_sprite = this.m_scene.add.sprite(this.m_x, this.m_y, 'healthbar').setOrigin(0.5);
         
         // Initialiser la barre de vie
         this.updateHealthBar();
@@ -27,9 +27,9 @@ export default class HealthBar {
     * Réduit la santé et met à jour la barre de vie.
     */
     takeDamage() {
-        if (this.health > 0) {
-            this.health--; // Réduire la santé
-            console.log('Santé actuelle :', this.health); // Afficher la santé actuelle
+        if (this.m_health > 0) {
+            this.m_health--; // Réduire la santé
+            console.log('Santé actuelle :', this.m_health); // Afficher la santé actuelle
             this.updateHealthBar(); // Mettre à jour la barre de vie
         }
     }
@@ -38,8 +38,8 @@ export default class HealthBar {
     * Met à jour le visuel de la barre de vie en fonction de la santé.
     */
     updateHealthBar() {
-        if (this.health >= 0) {
-            this.sprite.setFrame(this.health); // Met à jour l'image de la barre
+        if (this.m_health >= 0) {
+            this.m_sprite.setFrame(this.m_health); // Met à jour l'image de la barre
         }
     }
 }

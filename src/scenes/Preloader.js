@@ -17,30 +17,30 @@ export class Preloader extends Scene {
     * Configure la barre de progression et le texte de chargement.
     */
     init() {
-        const centerX = this.scale.width / 2; // Centre horizontal
-        const centerY = this.scale.height / 2; // Centre vertical
+        const v_centerX = this.scale.width / 2; // Centre horizontal
+        const v_centerY = this.scale.height / 2; // Centre vertical
         
         // Bordure de la barre de progression
-        this.add.rectangle(centerX, centerY, 468, 32).setStrokeStyle(1, 0xffffff);
+        this.add.rectangle(v_centerX, v_centerY, 468, 32).setStrokeStyle(1, 0xffffff);
         
         // Barre de progression interne
-        const progressBar = this.add.rectangle(centerX - 230, centerY, 4, 28, 0xffffff);
+        const v_progressBar = this.add.rectangle(v_centerX - 230, v_centerY, 4, 28, 0xffffff);
         
         // Texte de chargement
-        const loadingText = this.add.text(centerX, centerY - 50, 'Chargement...', {
+        const v_loadingText = this.add.text(v_centerX, v_centerY - 50, 'Chargement...', {
             fontFamily: 'Arial',
             fontSize: '24px',
             color: '#ffffff'
         }).setOrigin(0.5);
         
         // Mise à jour de la barre de progression en fonction du chargement
-        this.load.on('progress', (progress) => {
-            progressBar.width = 4 + (460 * progress);
+        this.load.on('progress', (v_progress) => {
+            v_progressBar.width = 4 + (460 * v_progress);
         });
         
         // Mise à jour du texte lorsque le chargement est terminé
         this.load.on('complete', () => {
-            loadingText.setText('Chargement terminé !');
+            v_loadingText.setText('Chargement terminé !');
         });
     }
     

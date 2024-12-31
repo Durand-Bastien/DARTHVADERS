@@ -13,15 +13,17 @@ export class Game extends Scene {
     constructor() {
         super('Game'); // Identifiant unique de la scène
         
-        // Initialisation des variables
-        this.player = null;
-        this.enemy = null;
-        this.healthBar = null;
-        this.cursors = null;
-        this.lastShotTime = 0;
-        this.enemiesSquad = [];
-        this.squadCount = 0;
-        this.enemyProjectiles = null;
+        // Initialisation des variables globales
+        this.m_player = null;
+        this.m_enemy = null;
+        this.m_healthBar = null;
+        this.m_cursors = null;
+        this.m_lastShotTime = 0;
+        this.m_enemiesSquad = [];
+        this.m_squadCount = 0;
+        this.m_enemyProjectiles = null;
+        this.m_lastSpawn = 0;
+        this.m_difficulty = 1;
     }
     
     /**
@@ -29,12 +31,30 @@ export class Game extends Scene {
     */
     preload() {
         // Charger les spritesheets et images
-        this.load.spritesheet('enemy', 'assets/enemy1.png', { frameWidth: 60, frameHeight: 106 });
-        this.load.spritesheet('enemy_projectile', 'assets/enemy_projectile.png', { frameWidth: 13, frameHeight: 58 });
-        this.load.spritesheet('player', 'assets/player.png', { frameWidth: 82, frameHeight: 120 });
-        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', { frameWidth: 13, frameHeight: 58 });
-        this.load.spritesheet('explosion', 'assets/explosion.png', { frameWidth: 612, frameHeight: 612 });
-        this.load.spritesheet('healthbar', 'assets/healthbar.png', { frameWidth: 446, frameHeight: 57 });
+        this.load.spritesheet('enemy', 'assets/enemy1.png', {
+            frameWidth: 60,
+            frameHeight: 106
+        });
+        this.load.spritesheet('enemy_projectile', 'assets/enemy_projectile.png', {
+            frameWidth: 13,
+            frameHeight: 58
+        });
+        this.load.spritesheet('player', 'assets/player.png', {
+            frameWidth: 82,
+            frameHeight: 120
+        });
+        this.load.spritesheet('player_projectile', 'assets/player_projectile.png', {
+            frameWidth: 13,
+            frameHeight: 58
+        });
+        this.load.spritesheet('explosion', 'assets/explosion.png', {
+            frameWidth: 612,
+            frameHeight: 612
+        });
+        this.load.spritesheet('healthbar', 'assets/healthbar.png', {
+            frameWidth: 446,
+            frameHeight: 57
+        });
         this.load.image('background', 'assets/background_game.jpg');
     }
     
@@ -44,7 +64,8 @@ export class Game extends Scene {
     */
     create() {
         // Ajouter le fond d'écran et l'ajuster à la taille de l'écran
-        this.add.image(this.scale.width / 2, this.scale.height / 2, 'background')
+        this.add
+        .image(this.scale.width / 2, this.scale.height / 2, 'background')
         .setOrigin(0.5)
         .setDisplaySize(this.scale.width, this.scale.height);
         
@@ -71,22 +92,29 @@ export class Game extends Scene {
         });
         
         // Créer le joueur
-        this.player = new Player(this, this.scale.width * 0.5, this.scale.height * 0.9, 'player', 400);
+        this.m_player = new Player(
+            this,
+            this.scale.width * 0.5,
+            this.scale.height * 0.9,
+            'player',
+            400
+        );
         
         // Créer une première squad d'ennemis
-        this.enemySquad = new EnemySquad(this, this.scale.width * 0.5, this.scale.height * 0.2, 10, 'triangle-down', this.player);
+        this.m_enemySquad = new EnemySquad(
+            this,
+            this.scale.width * 0.5,
+            this.scale.height * 0.2,
+            10,
+            'triangle-down',
+            this.m_player
+        );
         
         // Créer un groupe pour les projectiles ennemis
-        this.enemyProjectiles = this.physics.add.group();
+        this.m_enemyProjectiles = this.physics.add.group();
         
         // Configurer les touches du clavier
-        this.cursors = this.input.keyboard.createCursorKeys();
-        
-        // Initialiser le temps du dernier spawn
-        this.lastSpawn = 0;
-        
-        // Définir la difficulté initiale
-        this.difficulty = 1;
+        this.m_cursors = this.input.keyboard.createCursorKeys();
     }
     
     /**
@@ -96,45 +124,52 @@ export class Game extends Scene {
     */
     update(time) {
         // Déplacement du joueur
-        this.player.move(this.cursors);
+        this.m_player.move(this.m_cursors);
         
         // Gérer les squads d'ennemis
-        this.enemiesSquad.forEach((squad, index) => {
-            squad.move(time);
+        this.m_enemiesSquad.forEach((v_squad, v_index) => {
+            v_squad.move(time);
             
             // Supprimer les squads vides
-            if (Object.keys(squad.enemies).length === 0) {
-                squad.destroy();
-                this.enemiesSquad.splice(index, 1);
+            if (Object.keys(v_squad.m_enemies).length === 0) {
+                v_squad.destroy();
+                this.m_enemiesSquad.splice(v_index, 1);
             }
             
             // Gérer les collisions entre le joueur et les ennemis
-            Object.entries(squad.enemies).forEach(([id, enemy]) => {
-                this.player.addEnemyCollision(enemy);
+            Object.entries(v_squad.m_enemies).forEach(([v_id, v_enemy]) => {
+                this.m_player.addEnemyCollision(v_enemy);
             });
         });
         
         // Générer de nouvelles squads toutes les 5 secondes
-        if (time > this.lastSpawn + 5000) {
-            const shape = Math.random() > 0.5 ? 'triangle-down' : 'line';
-            const number = Math.random() * 10;
-            const newSquad = new EnemySquad(this, this.scale.width * Math.random(), this.scale.height * 0.1, number, shape, this.player);
+        if (time > this.m_lastSpawn + 5000) {
+            const v_shape = Math.random() > 0.5 ? 'triangle-down' : 'line';
+            const v_number = Math.random() * 10;
+            const v_newSquad = new EnemySquad(
+                this,
+                this.scale.width * Math.random(),
+                this.scale.height * 0.1,
+                v_number,
+                v_shape,
+                this.m_player
+            );
             
-            newSquad.checkShape();
-            this.enemiesSquad.push(newSquad);
-            this.lastSpawn = time;
+            v_newSquad.checkShape();
+            this.m_enemiesSquad.push(v_newSquad);
+            this.m_lastSpawn = time;
         }
         
         // Gestion du tir automatique
-        if (time > this.lastShotTime + 250) {
-            this.player.shoot();
-            this.lastShotTime = time;
+        if (time > this.m_lastShotTime + 250) {
+            this.m_player.shoot();
+            this.m_lastShotTime = time;
         }
         
         // Nettoyer les projectiles inactifs
-        this.enemyProjectiles.getChildren().forEach(projectile => {
-            if (!projectile.active) {
-                this.enemyProjectiles.remove(projectile, true, true);
+        this.m_enemyProjectiles.getChildren().forEach((v_projectile) => {
+            if (!v_projectile.active) {
+                this.m_enemyProjectiles.remove(v_projectile, true, true);
             }
         });
     }
