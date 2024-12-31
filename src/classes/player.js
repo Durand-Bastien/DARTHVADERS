@@ -36,9 +36,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.m_enemies = {};
         
         // Zone pour détecter les projectiles hors de l'écran
-        this.m_boundsTriggerPlayerProjectile = this.m_scene.add.zone(0, -30, p_scene.scale.width, 10)
+        this.m_boundsTriggerPlayerProjectile = this.m_scene.add
+        .zone(0, -30, p_scene.scale.width, 10)
         .setOrigin(0)
         .setDepth(-1);
+        
         this.m_scene.physics.add.existing(this.m_boundsTriggerPlayerProjectile, true);
         
         // Configuration physique
@@ -83,9 +85,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     takeDamage() {
         if (!this.m_isAlive) return;
         
+        // Réduire la vie via la HealthBar
         this.m_healthBar.takeDamage();
         
-        if (this.m_healthBar.health <= 0) {
+        // Vérifier si la vie est égale ou inférieure à 0
+        if (this.m_healthBar.m_health <= 0) {
             console.log('Le joueur est mort');
             this.m_isAlive = false;
             this.die();
@@ -99,6 +103,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     die() {
         this.setVelocity(0, 0); // Arrêter le joueur
         this.m_scene.time.delayedCall(1500, () => {
+            // Arrêter la scène de jeu et lancer GameOver
             this.m_scene.scene.stop('Game');
             this.m_scene.scene.start('GameOver');
         });
@@ -109,31 +114,31 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     * @param {number} p_projectileSpeed - Vitesse du projectile.
     */
     shoot(p_projectileSpeed = 300) {
-        const v_centerX = this.x + (this.width / 2);
+        const v_centerX = this.x + this.width / 2;
         let v_projectile;
         
         // Alterner entre les tirs gauche et droite
         if (!this.m_lastFiredLeft) {
             v_projectile = this.m_projectiles.create(
-                v_centerX + (this.width / 2),
+                v_centerX + this.width / 2,
                 this.y + 5,
                 'player_projectile'
             );
             this.m_scene.physics.moveTo(
                 v_projectile,
-                v_centerX + (this.width / 2),
+                v_centerX + this.width / 2,
                 this.y - 500,
                 p_projectileSpeed
             );
         } else {
             v_projectile = this.m_projectiles.create(
-                v_centerX - (this.width / 2),
+                v_centerX - this.width / 2,
                 this.y + 5,
                 'player_projectile'
             );
             this.m_scene.physics.moveTo(
                 v_projectile,
-                v_centerX - (this.width / 2),
+                v_centerX - this.width / 2,
                 this.y - 500,
                 p_projectileSpeed
             );
