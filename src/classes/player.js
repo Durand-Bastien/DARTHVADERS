@@ -1,70 +1,87 @@
 import HealthBar from './healthbar.js';
 
+/**
+* Classe Player.
+* Représente le joueur dans le jeu, avec des capacités de mouvement, de tir, et une barre de vie.
+*/
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, speed=160, currentWeapon='default') 
-    {
-        // Appelle le constructeur parent
+    /**
+    * Constructeur du joueur.
+    * Initialise les propriétés et la configuration physique du joueur.
+    * @param {Phaser.Scene} scene - La scène où le joueur est ajouté.
+    * @param {number} x - Position initiale en X.
+    * @param {number} y - Position initiale en Y.
+    * @param {string} texture - Texture du joueur.
+    * @param {number} speed - Vitesse de déplacement.
+    * @param {string} currentWeapon - Arme utilisée par défaut.
+    */
+    constructor(scene, x, y, texture, speed = 160, currentWeapon = 'default') {
         super(scene, x, y, texture);
         
-        // Ajoute le joueur à la scène et lui assigne un corps physique
+        // Ajouter le joueur à la scène et activer son corps physique
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        // Créer la barre de vie
+        
+        // Créer une barre de vie pour le joueur
         this.healthBar = new HealthBar(scene, scene.scale.width * 0.15, scene.scale.height * 0.075);
-      
+        
+        // Initialisation des propriétés du joueur
         this.setOrigin(0, 0);
-
-        this.boundsTriggerPlayerProjectile = this.scene.add.zone(0, -30, this.scene.scale.width, 10)
-            .setOrigin(0)
-            .setDepth(-1); // Invisible
-        this.scene.physics.add.existing(this.boundsTriggerPlayerProjectile, true);
-      
-        // Définit des propriétés du joueur
-        this.speed = speed;      // Vitesse de déplacement
-        this.isAlive = true;     // Indique si le joueur est vivant
+        this.speed = speed;
+        this.isAlive = true;
         this.currentWeapon = currentWeapon;
         this.projectiles = scene.physics.add.group();
         this.lastFiredLeft = true;
         this.enemies = {};
         
-        // Configuration du corps physique du joueur
-        this.setCollideWorldBounds(true);  // Le joueur ne sort pas des limites du monde
+        // Zone pour détecter les projectiles hors de l'écran
+        this.boundsTriggerPlayerProjectile = this.scene.add.zone(0, -30, this.scene.scale.width, 10)
+        .setOrigin(0)
+        .setDepth(-1);
+        this.scene.physics.add.existing(this.boundsTriggerPlayerProjectile, true);
+        
+        // Configuration physique
+        this.setCollideWorldBounds(true);
         
         // Jouer l'animation 'player_idle'
         this.play('player_idle');
-
+        
+        // Créer l'animation pour les projectiles
         this.scene.anims.create({
-            key: 'player_projectile', // Le nom de l'animation
-            frames: this.anims.generateFrameNumbers('player_projectile', { start: 0, end: 2 }), // Frames de l'animation
-            frameRate: 8, // Vitesse de l'animation
-            //repeat: 0 // Répéter l'animation en boucle
+            key: 'player_projectile',
+            frames: this.anims.generateFrameNumbers('player_projectile', { start: 0, end: 2 }),
+            frameRate: 8
         });
     }
     
-    move(cursors)
-    {
-        if(this.isAlive)
-            {
-            // Réinitialiser la vélocité du joueur
-            this.setVelocity(0);
-            
-            // Vérifier les touches enfoncées
-            if (cursors.left.isDown) {
-                this.setVelocityX(-this.speed);  // Déplace vers la gauche
-            }
-            else if (cursors.right.isDown) {
-                this.setVelocityX(this.speed);   // Déplace vers la droite
-            }
+    /**
+    * Déplacement du joueur.
+    * Met à jour la position du joueur en fonction des touches pressées.
+    * @param {Phaser.Types.Input.Keyboard.CursorKeys} cursors - Les touches de déplacement.
+    */
+    move(cursors) {
+        if (!this.isAlive) return;
+        
+        // Réinitialiser la vélocité du joueur
+        this.setVelocity(0);
+        
+        // Déplacer à gauche ou à droite selon les entrées
+        if (cursors.left.isDown) {
+            this.setVelocityX(-this.speed);
+        } else if (cursors.right.isDown) {
+            this.setVelocityX(this.speed);
         }
     }
     
-    // Méthode pour recevoir des dégâts
+    /**
+    * Gestion des dégâts reçus par le joueur.
+    * Réduit la santé et vérifie si le joueur doit mourir.
+    */
     takeDamage() {
-        // Vérifier si le joueur est vivant
         if (!this.isAlive) return;
-        // Réduire la santé du joueur
+        
         this.healthBar.takeDamage();
-
+        
         if (this.healthBar.health <= 0) {
             console.log('Le joueur est mort');
             this.isAlive = false;
@@ -72,47 +89,56 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
     
-    // Méthode appelée lorsque le joueur meurt
+    /**
+    * Action de mort du joueur.
+    * Arrête le joueur et passe à l'écran Game Over.
+    */
     die() {
-        this.setVelocity(0, 0);  // Arrête le joueur
-        // Arreter les tirs du joueur
-        // Joueur le spritesheet d'explosion du joueur
+        this.setVelocity(0, 0); // Arrêter le joueur
         this.scene.time.delayedCall(1500, () => {
-            this.scene.scene.stop('Game'); // Arrête la scène actuelle
-            this.scene.scene.start('GameOver'); // Redirige vers l'écran de fin de partie
+            this.scene.scene.stop('Game');
+            this.scene.scene.start('GameOver');
         });
     }
     
-    // Méthode pour tirer un projectile
+    /**
+    * Permet au joueur de tirer un projectile.
+    * @param {number} projectileSpeed - Vitesse du projectile.
+    */
     shoot(projectileSpeed = 300) {
-        const centerX = this.x+(this.width/2)
-        var projectile = null;
-        if(!this.lastFiredLeft) {
-            projectile = this.projectiles.create(centerX+(this.width/2), this.y+5, 'player_projectile'); // Sprite pour le projectile
-            this.scene.physics.moveTo(projectile, centerX+(this.width/2), this.y-500, projectileSpeed); 
-            this.lastFiredLeft = !this.lastFiredLeft
+        const centerX = this.x + (this.width / 2);
+        let projectile;
+        
+        // Alterner entre les tirs gauche et droite
+        if (!this.lastFiredLeft) {
+            projectile = this.projectiles.create(centerX + (this.width / 2), this.y + 5, 'player_projectile');
+            this.scene.physics.moveTo(projectile, centerX + (this.width / 2), this.y - 500, projectileSpeed);
+        } else {
+            projectile = this.projectiles.create(centerX - (this.width / 2), this.y + 5, 'player_projectile');
+            this.scene.physics.moveTo(projectile, centerX - (this.width / 2), this.y - 500, projectileSpeed);
         }
-        else {
-            projectile = this.projectiles.create(centerX-(this.width/2), this.y+5, 'player_projectile'); // Sprite pour le projectile
-            this.scene.physics.moveTo(projectile, centerX-(this.width/2), this.y-500, projectileSpeed);
-            this.lastFiredLeft = !this.lastFiredLeft 
-        }
+        this.lastFiredLeft = !this.lastFiredLeft;
+        
+        // Jouer l'animation du projectile
         projectile.anims.play('player_projectile');
         
-        this.scene.physics.add.overlap(projectile, this.boundsTriggerPlayerProjectile, (projectile) => {
+        // Détruire les projectiles sortis de l'écran
+        this.scene.physics.add.overlap(projectile, this.boundsTriggerPlayerProjectile, () => {
             this.projectiles.remove(projectile, true, true);
-            console.log('proj détruit')
         });
     }
-
+    
+    /**
+    * Ajoute une gestion de collision entre les projectiles et un ennemi.
+    * @param {Phaser.GameObjects.GameObject} enemy - L'ennemi à vérifier pour les collisions.
+    */
     addEnemyCollision(enemy) {
-        // Itérer sur tous les projectiles dans le groupe
         this.projectiles.getChildren().forEach(projectile => {
             this.scene.physics.add.overlap(projectile, enemy, () => {
                 if (enemy.takeDamage) {
-                    enemy.takeDamage(1);  // Inflige des dégâts à l'ennemi
+                    enemy.takeDamage(1);
                 }
-                this.projectiles.remove(projectile, true, true);  // Détruit le projectile après la collision
+                this.projectiles.remove(projectile, true, true);
             });
         });
     }

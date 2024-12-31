@@ -30,6 +30,8 @@
         "vite": "^5.3.1"
     },
     "jest": {
-        "setupFiles": ["jest-canvas-mock"]
-      }
+        "setupFiles": [
+            "jest-canvas-mock"
+        ]
+    }
 }

@@ -1,14 +1,21 @@
+/* Réinitialisation des marges et des bordures pour un style uniforme */
 body {
     margin: 0;
     padding: 0;
+    /* Couleur de texte principale (blanc translucide) */
     color: rgba(255, 255, 255, 0.87);
+    /* Couleur de fond principale (noir) */
     background-color: #000000;
 }
 
+/* Conteneur principal de l'application */
 #app {
+    /* Largeur et hauteur en pleine page */
     width: 100%;
     height: 100vh;
+    /* Empêche le débordement des éléments */
     overflow: hidden;
+    /* Aligne le contenu au centre (horizontalement et verticalement) */
     display: flex;
     justify-content: center;
     align-items: center;

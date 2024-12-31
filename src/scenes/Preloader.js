@@ -1,43 +1,70 @@
 import { Scene } from 'phaser';
 
-export class Preloader extends Scene
-{
-    constructor ()
-    {
-        super('Preloader');
+/**
+* Scène Preloader.
+* Responsable de l'affichage de la barre de chargement et du chargement des ressources nécessaires au jeu.
+*/
+export class Preloader extends Scene {
+    /**
+    * Constructeur de la scène Preloader.
+    */
+    constructor() {
+        super('Preloader'); // Identifiant unique de la scène
     }
-
-    init ()
-    {
-        //  A simple progress bar. This is the outline of the bar.
-        this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
-
-        //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-        const bar = this.add.rectangle(512-230, 384, 4, 28, 0xffffff);
-
-        //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
+    
+    /**
+    * Initialisation de la scène Preloader.
+    * Configure la barre de progression et le texte de chargement.
+    */
+    init() {
+        const centerX = this.scale.width / 2; // Centre horizontal
+        const centerY = this.scale.height / 2; // Centre vertical
+        
+        // Bordure de la barre de progression
+        this.add.rectangle(centerX, centerY, 468, 32).setStrokeStyle(1, 0xffffff);
+        
+        // Barre de progression interne
+        const progressBar = this.add.rectangle(centerX - 230, centerY, 4, 28, 0xffffff);
+        
+        // Texte de chargement
+        const loadingText = this.add.text(centerX, centerY - 50, 'Chargement...', {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        
+        // Mise à jour de la barre de progression en fonction du chargement
         this.load.on('progress', (progress) => {
-
-            //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
-            bar.width = 4 + (460 * progress);
-
+            progressBar.width = 4 + (460 * progress);
+        });
+        
+        // Mise à jour du texte lorsque le chargement est terminé
+        this.load.on('complete', () => {
+            loadingText.setText('Chargement terminé !');
         });
     }
-
-    preload ()
-    {
-        //  Load the assets for the game - Replace with your own assets
-        this.load.setPath('assets');
-
+    
+    /**
+    * Chargement des ressources nécessaires.
+    */
+    preload() {
+        this.load.setPath('assets'); // Définir le chemin des assets
+        
+        // Charger les ressources du jeu
         this.load.image('logo', 'logo.png');
+        this.load.image('background', 'background.png');
     }
-
-    create ()
-    {
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
-
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+    
+    /**
+    * Création de la scène Preloader.
+    * Passe à la scène suivante après une transition fluide.
+    */
+    create() {
+        this.cameras.main.fadeOut(1000, 0, 0, 0); // Transition avec un fondu noir
+        
+        // Lancer la scène MainMenu après la transition
+        this.time.delayedCall(1000, () => {
+            this.scene.start('MainMenu');
+        });
     }
 }

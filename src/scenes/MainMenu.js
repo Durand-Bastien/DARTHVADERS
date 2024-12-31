@@ -1,37 +1,58 @@
 import { Scene } from 'phaser';
 
+/**
+* Scène MainMenu.
+* Affiche le menu principal avec un bouton pour commencer le jeu.
+*/
 export class MainMenu extends Scene {
-    constructor () {
-        super('MainMenu');
+    /**
+    * Constructeur de la scène MainMenu.
+    */
+    constructor() {
+        super('MainMenu'); // Identifiant unique de la scène
     }
-
-    create () {
-        this.cameras.main.setBackgroundColor(0x000000);
-
-        this.add.image(window.innerWidth / 2, window.innerHeight / 2 - 120, 'logo')
-            .setOrigin(0.5);
-
-        const playText = this.add.text(window.innerWidth / 2, window.innerHeight / 2 + 50, 'Jouer', {
-            fontFamily: 'Arial Black', fontSize: 48, color: '#ffffff',
-            stroke: '#000000',
-            align: 'center'
-        }).setOrigin(0.5);
-
-        // Rendre le texte interactif
+    
+    /**
+    * Création de la scène MainMenu.
+    * Initialise le logo et le bouton "Jouer".
+    */
+    create() {
+        const centerX = this.scale.width / 2; // Centre horizontal de l'écran
+        const centerY = this.scale.height / 2; // Centre vertical de l'écran
+        
+        // Ajouter le logo au centre, légèrement au-dessus
+        this.add.image(centerX, centerY - 120, 'logo').setOrigin(0.5);
+        
+        // Ajouter le texte "Jouer" en tant que bouton
+        const playText = this.add.text(
+            centerX, // Position horizontale (centre de l'écran)
+            centerY + 50, // Position verticale
+            'Jouer', // Texte affiché
+            {
+                fontFamily: 'Arial Black', // Police de caractères
+                fontSize: '48px', // Taille de la police
+                color: '#ffffff', // Couleur initiale du texte
+                stroke: '#000000', // Contour noir
+                align: 'center' // Alignement du texte
+            }
+        ).setOrigin(0.5); // Centre le texte autour de son point d'origine
+        
+        // Rendre le texte interactif pour détecter les clics et les survols
         playText.setInteractive({ useHandCursor: true });
-
-        // Effet "hover" (souris au-dessus)
+        
+        // Effet de survol : changer la couleur du texte en jaune
         playText.on('pointerover', () => {
-            playText.setStyle({ color: '#FFE81F' }); // Change la couleur en rouge
+            playText.setStyle({ color: '#FFE81F' });
         });
-
-        // Effet "hover out" (souris quitte)
+        
+        // Effet de sortie du survol : revenir à la couleur blanche
         playText.on('pointerout', () => {
-            playText.setStyle({ color: '#ffffff' }); // Reviens à la couleur blanche
+            playText.setStyle({ color: '#ffffff' });
         });
-
+        
+        // Gestion du clic sur le bouton "Jouer"
         this.input.once('pointerdown', () => {
-            this.scene.start('Game');
+            this.scene.start('Game'); // Transition vers la scène Game
         });
     }
 }
